@@ -35,3 +35,6 @@ override.tf.json
 # Secret files
 **/secret/*.json
 **/secret/*.tfvars
+
+# Plan files
+*.plan
