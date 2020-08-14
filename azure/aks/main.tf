@@ -5,7 +5,8 @@ provider "azurerm" {
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
-  version = "~> 1.27.0"
+  version = "~> 2.0"
+  features {}
 }
 
 resource "azurerm_resource_group" "default" {
@@ -23,14 +24,20 @@ resource "azurerm_kubernetes_cluster" "default" {
   resource_group_name = azurerm_resource_group.default.name
   dns_prefix          = "${random_pet.prefix.id}-k8s"
 
-  agent_pool_profile {
+  default_node_pool {
     name            = "default"
-    count           = 2
+    node_count      = 1
     vm_size         = "Standard_D2_v2"
-    os_type         = "Linux"
     os_disk_size_gb = 30
   }
 
+  linux_profile {
+      admin_username = "k8s"
+
+      ssh_key {
+          key_data = file(var.ssh_public_key)
+      }
+  }
   service_principal {
     client_id     = var.client_id
     client_secret = var.client_secret
@@ -38,6 +45,17 @@ resource "azurerm_kubernetes_cluster" "default" {
 
   role_based_access_control {
     enabled = true
+  }
+
+  addon_profile {
+      oms_agent {
+      enabled     = false
+      }
+  }
+
+  network_profile {
+    load_balancer_sku = "Standard"
+    network_plugin = "kubenet"
   }
 
   tags = {

@@ -15,3 +15,8 @@ variable "client_id" {
 variable "client_secret" {
   description = "Azure service principal application Secret"
 }
+
+variable "ssh_public_key" {
+    description = "Cluster ssh key"
+    default = "~/.ssh/id_rsa.pub"
+}
