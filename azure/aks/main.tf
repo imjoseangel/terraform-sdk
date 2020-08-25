@@ -19,10 +19,11 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
-  name                = "${random_pet.prefix.id}-aks"
+  count               = length(var.k8s_names)
+  name                = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-aks"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
-  dns_prefix          = "${random_pet.prefix.id}-k8s"
+  dns_prefix          = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-k8s"
 
   default_node_pool {
     name            = "default"
