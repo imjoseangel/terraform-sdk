@@ -24,5 +24,5 @@ variable "ssh_public_key" {
 variable "k8s_names" {
   description = "Create AKS with these names"
   type        = list(string)
-  default     = ["neo", "trinity", "morpheus"]
+  default     = ["neo"]
 }
