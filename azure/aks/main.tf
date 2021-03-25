@@ -5,7 +5,6 @@ provider "azurerm" {
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
-  version = "~> 2.0"
   features {}
 }
 
@@ -19,11 +18,12 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
-  count               = length(var.k8s_names)
-  name                = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-aks"
-  location            = azurerm_resource_group.default.location
-  resource_group_name = azurerm_resource_group.default.name
-  dns_prefix          = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-k8s"
+  count                           = length(var.k8s_names)
+  name                            = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-aks"
+  location                        = azurerm_resource_group.default.location
+  resource_group_name             = azurerm_resource_group.default.name
+  dns_prefix                      = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-k8s"
+  api_server_authorized_ip_ranges = ["0.0.0.0/0"]
 
   default_node_pool {
     name            = "default"
