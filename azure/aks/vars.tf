@@ -16,9 +16,13 @@ variable "client_secret" {
   description = "Azure service principal application Secret"
 }
 
+variable "network_plugin" {
+  default = "kubenet"
+}
+
 variable "ssh_public_key" {
-    description = "Cluster ssh key"
-    default = "~/.ssh/id_rsa.pub"
+  description = "Cluster ssh key"
+  default     = "~/.ssh/id_rsa.pub"
 }
 
 variable "k8s_names" {
