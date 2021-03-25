@@ -26,37 +26,41 @@ resource "azurerm_kubernetes_cluster" "default" {
   api_server_authorized_ip_ranges = ["0.0.0.0/0"]
 
   default_node_pool {
-    name            = "default"
-    node_count      = 1
-    vm_size         = "Standard_D2_v2"
-    os_disk_size_gb = 30
+    name                = "agentpool"
+    node_count          = 3
+    vm_size             = "Standard_D2s_v3"
+    enable_auto_scaling = true
+    type                = "VirtualMachineScaleSets"
+    availability_zones  = ["1", "2", "3"]
+    max_count           = 15
+    min_count           = 3
+    os_disk_size_gb     = 128
   }
 
   linux_profile {
-      admin_username = "k8s"
+    admin_username = "k8s"
 
-      ssh_key {
-          key_data = file(var.ssh_public_key)
-      }
+    ssh_key {
+      key_data = file(var.ssh_public_key)
+    }
   }
-  service_principal {
-    client_id     = var.client_id
-    client_secret = var.client_secret
-  }
-
-  role_based_access_control {
-    enabled = true
-  }
-
   addon_profile {
-      oms_agent {
-      enabled     = false
-      }
+    oms_agent {
+      enabled = false
+    }
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   network_profile {
     load_balancer_sku = "Standard"
-    network_plugin = "kubenet"
+    network_plugin    = var.network_plugin
+  }
+
+  role_based_access_control {
+    enabled = true
   }
 
   tags = {
