@@ -87,3 +87,16 @@ resource "azurerm_kubernetes_cluster" "default" {
     environment = "Demo"
   }
 }
+
+resource "azurerm_role_assignment" "aks" {
+  count                = length(var.k8s_names)
+  scope                = azurerm_subnet.subnet.id
+  role_definition_name = "Monitoring Metrics Publisher"
+  principal_id         = azurerm_kubernetes_cluster.default[count.index].identity[0].principal_id
+}
+resource "azurerm_role_assignment" "aks_subnet" {
+  count                = length(var.k8s_names)
+  scope                = azurerm_subnet.subnet.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.default[count.index].identity[0].principal_id
+}
