@@ -6,11 +6,34 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "default" {
   name     = "${random_pet.prefix.id}-rg"
-  location = "West US 2"
+  location = var.location
 
   tags = {
     environment = "Demo"
   }
+}
+
+resource "azurerm_resource_group" "vnet" {
+  name     = var.vnet_resource_group_name
+  location = var.location
+}
+
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-aks"
+  address_space       = ["10.100.0.0/23"]
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.vnet.name
+  tags = {
+    "env"    = "demo"
+    "object" = "vnet"
+  }
+}
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "subnet-aksnodes"
+  address_prefixes     = ["10.100.0.0/24"]
+  resource_group_name  = azurerm_resource_group.vnet.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
@@ -18,6 +41,7 @@ resource "azurerm_kubernetes_cluster" "default" {
   name                            = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-aks"
   location                        = azurerm_resource_group.default.location
   resource_group_name             = azurerm_resource_group.default.name
+  node_resource_group             = var.aksnodes_resource_group_name
   dns_prefix                      = "${random_pet.prefix.id}-${var.k8s_names[count.index]}-k8s"
   api_server_authorized_ip_ranges = ["0.0.0.0/0"]
 
