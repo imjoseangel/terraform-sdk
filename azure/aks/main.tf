@@ -49,6 +49,7 @@ resource "azurerm_kubernetes_cluster" "default" {
     name                = "agentpool"
     node_count          = 3
     vm_size             = "Standard_D2s_v3"
+    vnet_subnet_id      = azurerm_subnet.subnet.id
     enable_auto_scaling = true
     type                = "VirtualMachineScaleSets"
     availability_zones  = ["1", "2", "3"]
